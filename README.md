@@ -228,7 +228,7 @@ app.run()
 
 Si usáramos la resolución de 3, sería un triangulo, pero si tomaramos la resolución de 12 será un dodecágono, entre más tenga, parecerá más un círculo.
 
-## 2.3) Plane
+## 2.3) Clase 4 :  Plano (Plane) 
 
 ### Documentación
 
@@ -271,7 +271,7 @@ Es un plano  simple sin color, de 1x1, sin embargo se necesitó rotar debido a q
 
 ### Código de la documentación
 
-El código es obtenido de la documentación oficial
+El código es obtenido de la documentación oficial:
 
 ```python
 front =  Entity(model=Plane(subdivisions=(3,6)), texture='brick', rotation_x=-90)
@@ -318,7 +318,115 @@ app.run()
 
 Cómo se observa tiene textura que viene incluida en el motor de ursina, pero además tiene división 3x6 y esta rotado 90 grados, para poder visualizarse.
 
-## 2.4) Grid
+## 2.4) Clase 5 : Grid (Rejilla) 
+
+Aunque claramente la traducción de **rejilla** no es precisamente correcta es el termino que más se le parece a lo que trata de representar el elemento, para mi es más fácil tratar de especificar que es este tipo de elementos a partir de un ejemplo, para ello observa las siguientes tres imágenes (viendo que tienen en común):
+
+Imagen 1)
+
+![image-20231226233650535](assets/image-20231226233650535.png)
+
+Imagen 2)
+
+![image-20231226233825255](assets/image-20231226233825255.png)
+
+Imagen 3)
+
+![image-20231226233927796](assets/image-20231226233927796.png)
+
+¿Lo adivinaste? Las imágenes están formadas por cuadriculas para organizar, referenciar la posición de los elementos, toma como idea el `grid` de `CSS` :
+
+![image-20231226234122396](assets/image-20231226234122396.png)
+
+Si yo quisiera  iluminar los cuadros rojos de la imagen anterior porque es lava en un videojuego, podría usar `grid` especificando la posición de los recuadros rojos  y con ello realizar una acción, es decir que nos sirve construir el escenario que estamos planeando.
+
+**Código básico:**
+
+```python
+# Clase5.py
+from ursina import *
+
+app = Ursina()
+
+grid = Entity(model=Grid(2, 6))
+
+app.run()
+```
+
+el resultado es el siguiente:
+
+![image-20231227001126209](assets/image-20231227001126209.png)
+
+Un grid únicamente mostrando las divisiones, 2 divisiones de ancho y  6 de alto, en este caso es indispensable especificar el número de divisones tanto vertical como horizontalmente.
+
+**Código de la documentación:**
+
+```python
+Entity(model=Grid(2, 6))
+```
+
+`Entity(model=Grid(2, 6))`: Este es un ejemplo de cómo crear una entidad (objeto en la escena) utilizando la clase `Grid` como su modelo. Aquí se crea una entidad con una rejilla que tiene una anchura de 2 unidades y una altura de 6 unidades. En `ursina`, una `Entity` es un objeto general que puede tener un modelo, una textura, una posición, etc., y al asignarle un modelo `Grid`, se convierte en una representación visual de la rejilla en la escena.
+
+**Versión modificada del código de la documentación:**
+
+Para el caso de este código se mostrará un caso de ejemplo de una cuadricula de colores que es posible interactuar mediante el mouse en cada uno de los diferentes cuadros (dando click izquierdo) , además es posible rotar la cuadricula con las flechas (flecha **derecha,izquierda** rotar con respecto al eje "y", **flecha arriba,abajo**, rotar con respecto al eje "x").
+
+```python
+# clase5_con_movimiento.py
+from ursina import *
+
+def update():
+    # Rotar en el eje Y (izquierda / derecha)
+    if held_keys['left arrow']:
+        grid.rotation_y += time.dt * 100
+    if held_keys['right arrow']:
+        grid.rotation_y -= time.dt * 100
+
+    # Rotar en el eje X (arriba / abajo)
+    if held_keys['up arrow']:
+        grid.rotation_x += time.dt * 100
+    if held_keys['down arrow']:
+        grid.rotation_x -= time.dt * 100
+
+app = Ursina()
+
+# Crear un grid
+grid = Entity()
+
+# Crear cuadrados en el grid y asignarles colores aleatorios
+for y in range(5):
+    for x in range(5):
+        b = Button(parent=grid, position=(x, y), color=color.random_color())
+
+# Asegurarse de que la cámara no rota con el grid
+camera.parent = scene
+
+app.run()
+```
+
+el resultado se muestra a continuación:
+
+![image-20231227001215592](assets/image-20231227001215592.png)
+
+**Tomando la documentación oficial:**
+
+Vamos a tomar la documentación para tomar esto con verdadero y extender nuestro entendimiento de clase (**puedes omitirlo si deseas**)
+
+![image-20231227000653429](assets/image-20231227000653429.png)
+
+De la documentación vemos lo siguiente:
+
+- `Grid(Mesh)`: Esto indica que `Grid` es una clase que probablemente hereda de `Mesh` o está relacionada con la creación de una malla (mesh), que es una estructura compuesta de vértices, aristas y caras que define la forma de un objeto poligonal en 3D.
+- `ursina/models/procedural/grid`: Esta es la ruta donde se encuentra definida la clase `Grid` dentro de la estructura de directorios del paquete `ursina`. `models/procedural/grid` sugiere que es un modelo procedimental, es decir, que se genera automáticamente a través de código en lugar de ser modelado a mano.
+- `Grid(width, height, mode='line', thickness=1, **kwargs)`: Esta es la declaración de la función constructora de la clase `Grid`. Aquí están los parámetros que puedes especificar al crear una nueva instancia de `Grid`:
+
+  - `width`: La anchura de la rejilla en unidades de la escena.
+  - `height`: La altura de la rejilla en unidades de la escena.
+  - `mode='line'`: El modo en el que se dibuja la rejilla. El valor predeterminado `'line'` significa que la rejilla se representará como una serie de líneas.
+  - `thickness=1`: El grosor de las líneas de la rejilla. Por defecto es 1.
+  - `**kwargs`: Esto permite pasar argumentos adicionales que la clase `Grid` puede aceptar o que se pueden pasar a la clase base.
+- `.width = width`: Es una propiedad de la instancia de `Grid` que define su anchura.
+- `.height = height`: Es una propiedad de la instancia de `Grid` que define su altura.
 
 ## 2.5) Cone
 
@@ -345,4 +453,6 @@ Excelente guía rapida:
 Una serie (playlist) de videos viejos de como usarlo pero muy funcionales:
 
 - https://www.youtube.com/playlist?list=PLgQYnHnDxgtg-I3m01mGc5wfJwqpT9S3i
+
+- [Grid CSS: Introducción - CSS en español - Lenguaje CSS](https://lenguajecss.com/css/maquetacion-y-colocacion/grid-css/)
 
