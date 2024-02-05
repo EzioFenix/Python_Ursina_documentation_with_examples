@@ -428,19 +428,247 @@ De la documentación vemos lo siguiente:
 - `.width = width`: Es una propiedad de la instancia de `Grid` que define su anchura.
 - `.height = height`: Es una propiedad de la instancia de `Grid` que define su altura.
 
-## 2.5) Cone
+## 2.5)  Clase 6:  Cone (Cono)
 
-## 2.6) Cylinder
+```python
+# Importamos los componentes necesarios de Ursina
+from ursina import Ursina, Entity, color, EditorCamera, held_keys
 
-## 2.7) Pipe 
+# Creamos la aplicación de Ursina
+app = Ursina()
 
-## 2.8 ) Terrain
+# Creamos el cono con una resolución de 3 para que sea bajo poligonal y aplicamos una textura de ladrillo
+e = Entity(model=Cone(3), texture='brick')
+
+# Creamos una entidad que sirve como el origen para la rotación
+origin = Entity(model='quad', color=color.orange, scale=(.05, .05))
+
+# Inicializamos la cámara del editor para navegar en la escena
+ed = EditorCamera()
+
+# Definimos la función update que se llama en cada cuadro
+def update():
+    # Rotamos el cono alrededor del eje y (vertical) cuando se presiona la flecha derecha
+    if held_keys['right arrow']:
+        e.rotation_y += 45 * time.dt
+    # Rotamos el cono alrededor del eje y en la dirección opuesta cuando se presiona la flecha izquierda
+    if held_keys['left arrow']:
+        e.rotation_y -= 45 * time.dt
+
+# Llamamos a la función run para empezar el juego
+app.run()
+```
+
+**Explicación:**
+
+En la documentación de Ursina, la propiedad `model=Cone(3)` se refiere a la creación de un modelo en forma de cono. El número `3` en `Cone(3)` especifica el número de segmentos utilizados para crear la base del cono. Esto significa que la base del cono no será un círculo suave, sino más bien un triángulo, ya que se están utilizando tres segmentos para formar la base.
+
+Aumenta el número de manera gradual, para poder visualizar las diferencias del cono.
 
 
 
-# Clase 3 Trasformaciones básicas
+## 2.6)   Clase 7:  Cylinder (Cilindro)
 
 
+
+```python
+from ursina import Ursina, Entity, color, held_keys, Cylinder, EditorCamera
+
+def update():
+    # Controlar la rotación con las flechas del teclado
+    if held_keys['up arrow']:
+        ed.rotation_x += 1  # Rotar hacia arriba en el eje X
+    if held_keys['down arrow']:
+        ed.rotation_x -= 1  # Rotar hacia abajo en el eje X
+    if held_keys['left arrow']:
+        ed.rotation_y += 1  # Rotar a la izquierda en el eje Y
+    if held_keys['right arrow']:
+        ed.rotation_y -= 1  # Rotar a la derecha en el eje Y
+
+app = Ursina()
+
+# Crear un cilindro
+cilindro = Entity(model=Cylinder(resolution=6, start=-.5), color=color.color(60,1,1,.3))
+
+# Crear un marcador de origen para referencia
+origin = Entity(model='quad', color=color.orange, scale=(5, .05))
+
+# Usar la cámara de editor para una mejor visualización y control
+ed = EditorCamera(rotation_speed=200, panning_speed=200)
+
+app.run()
+```
+
+Ahora, al ejecutar este código y usar las flechas del teclado, la cámara girará alrededor del objeto en la escena, permitiéndote observar el cilindro desde diferentes ángulos. La cámara responderá a las entradas de las flechas del teclado de la siguiente manera:
+
+- Flecha arriba: La cámara gira hacia arriba.
+- Flecha abajo: La cámara gira hacia abajo.
+- Flecha izquierda: La cámara gira hacia la izquierda.
+- Flecha derecha: La cámara gira hacia la derecha.
+
+## 2.7) Clase 8: Pipe 
+
+```python
+from ursina import Ursina, Entity, Circle, Pipe, color, EditorCamera, held_keys
+
+def update():
+    # Controlar la rotación con las flechas del teclado
+    if held_keys['up arrow']:
+        editor_camera.rotation_x += 1
+    if held_keys['down arrow']:
+        editor_camera.rotation_x -= 1
+    if held_keys['left arrow']:
+        editor_camera.rotation_y += 1
+    if held_keys['right arrow']:
+        editor_camera.rotation_y -= 1
+
+app = Ursina()
+
+# Generar un camino (path) utilizando los vértices de un círculo, escalados por 5
+path = [vertex * 5 for vertex in Circle().vertices]
+
+# Añadir el primer punto al final del camino para cerrar el círculo
+path.append(path[0])
+
+# Crear una entidad con el modelo de Pipe utilizando el camino generado
+pipe_entity = Entity(model=Pipe(path=path, cap_ends=False))
+
+# Imprimir la cantidad de vértices y colores del modelo
+print(len(pipe_entity.model.vertices), len(pipe_entity.model.colors))
+
+# Configurar la cámara de editor para una mejor visualización y control
+editor_camera = EditorCamera(rotation_speed=200, panning_speed=200)
+
+# Crear una entidad para marcar el origen con un cubo magenta
+origin_marker = Entity(model='cube', color=color.magenta)
+origin_marker.scale *= .25
+
+app.run()
+
+```
+
+
+
+## 2.8 ) Clase 9:  Terrain
+
+```python
+from ursina import *
+from ursina.prefabs.first_person_controller import FirstPersonController
+import random
+
+app = Ursina()
+
+# Terreno generado a partir de una textura de mapa de altura
+terrain_from_heightmap_texture = Entity(
+    model=Terrain('heightmap_1', skip=8),
+    scale=(40, 5, 20),
+    texture='heightmap_1'
+)
+
+# Función para modificar el terreno basado en valores aleatorios
+def input(key):
+    if key == 'space':
+        terrain_from_list.model.height_values = [[random.uniform(0, 255) for _ in column] for column in terrain_from_list.model.height_values]
+        terrain_from_list.model.generate()
+
+# Terreno generado a partir de una lista de valores de altura
+hv = terrain_from_heightmap_texture.model.height_values.tolist()
+terrain_from_list = Entity(
+    model=Terrain(height_values=hv),
+    scale=(40, 5, 20),
+    texture='heightmap_1',
+    x=40
+)
+
+# Crear la cámara de editor y el cielo
+editor_camera = EditorCamera(rotation_speed=200, panning_speed=200)
+Sky()
+
+# Crear un jugador y asignarle el terreno como suelo
+player = FirstPersonController(model='sphere', color=color.azure, scale=2, origin_y=-.5)
+player.collider = 'mesh'
+player.gravity = 0.5
+player.ground = terrain_from_list
+
+# Actualizar la función para incluir la rotación de la cámara con las teclas de flecha
+def update():
+    if held_keys['up arrow']:
+        editor_camera.rotation_x -= 1
+    if held_keys['down arrow']:
+        editor_camera.rotation_x += 1
+    if held_keys['left arrow']:
+        editor_camera.rotation_y += 1
+    if held_keys['right arrow']:
+        editor_camera.rotation_y -= 1
+
+    # Movimiento del jugador
+    direction = Vec3(
+        held_keys['d'] - held_keys['a'],
+        0,
+        held_keys['w'] - held_keys['s']
+    ).normalized()
+    player.position += direction * time.dt * 8
+
+app.run()
+```
+
+
+
+# Bloque 2 Trasformaciones básicas
+
+## 1.Clase 10: Traslación (Movimiento)
+La traslación es el proceso de mover un objeto de un lugar a otro dentro de la escena. En Ursina, esto se hace modificando las propiedades `x`, `y`, y `z` del objeto.
+
+![882956f0-13c0-4392-bd30-d928d6316542](assets/882956f0-13c0-4392-bd30-d928d6316542.webp)
+
+**Ejemplo:**
+
+```python
+from ursina import *
+
+
+def update():
+    # Si la tecla 'a' es presionada, mueve el cubo 5 unidades a la izquierda
+    if held_keys['a']:
+        cube.y -= 5 * time.dt
+    # Si la tecla 'w' es presionada, mueve el cubo 5 unidades hacia adelante
+    if held_keys['w']:
+        cube.z += 5 * time.dt
+    if held_keys['d']:
+        cube.x += 5 * time.dt
+
+app = Ursina()
+
+# Crea un cubo en la escena
+cube = Entity(model='cube', color=color.white, scale=(1,1,1))
+
+# Inicia la aplicación
+app.run()
+```
+
+Este script crea un entorno 3D con un cubo que puede ser movido utilizando las teclas del teclado. Aquí está la descripción de lo que hace cada tecla según el código:
+
+- **Tecla 'a'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia abajo en el eje `y`. Esto se debe a que el valor de `y` del cubo disminuye, lo que hace que el cubo se traslade verticalmente hacia abajo en la escena.
+
+- **Tecla 'w'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia adelante en el eje `z`. Aumentar el valor de `z` del cubo lo traslada hacia adelante en la escena, alejándose de la cámara si esta tiene una posición fija y mira hacia el origen desde una perspectiva estándar.
+
+- **Tecla 'd'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia la derecha en el eje `x`. Esto se logra aumentando el valor de `x` del cubo, trasladándolo horizontalmente hacia la derecha en la pantalla.
+
+La función `update()` se ejecuta continuamente mientras la aplicación está en funcionamiento, revisando en cada fotograma si alguna de las teclas especificadas ('a', 'w', 'd') está siendo presionada. Dependiendo de la tecla presionada, el cubo se mueve en la dirección correspondiente. El uso de `time.dt` en el cálculo asegura que el movimiento del cubo sea suave y consistente, independientemente de la tasa de fotogramas del juego, adaptando la velocidad del movimiento a la duración del fotograma actual.
+
+## 2. Rotación
+La rotación implica girar un objeto alrededor de uno o más de sus ejes. En Ursina, esto se logra ajustando los atributos `rotation_x`, `rotation_y`, y `rotation_z`.
+
+## 3. Escalado
+El escalado cambia el tamaño de un objeto. En Ursina, se puede escalar un objeto modificando sus propiedades `scale_x`, `scale_y`, y `scale_z`.
+
+## 4. Inclinación (Shearing)
+La inclinación o 'shearing' es una transformación que distorsiona la forma de un objeto alterando sus ángulos. Aunque menos común, puede ser útil para efectos especiales o ciertas visualizaciones.
+
+## 5. Reflexión
+La reflexión es el espejado de un objeto respecto a un eje o plano. Se puede lograr mediante la modificación adecuada de las propiedades de escala y rotación.
+
+Cada una de estas transformaciones puede ser utilizada para manipular objetos en un entorno 3D en Ursina, permitiendo la creación de escenas dinámicas y atractivas. Además, estas transformaciones pueden combinarse para lograr efectos más complejos y detallados.
 
 
 
