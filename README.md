@@ -616,12 +616,14 @@ app.run()
 
 # Bloque 2 Trasformaciones básicas
 
-## 1.Clase 10: Traslación (Movimiento)
+## 1.Clase 10:  Translation (Traslación)
 La traslación es el proceso de mover un objeto de un lugar a otro dentro de la escena. En Ursina, esto se hace modificando las propiedades `x`, `y`, y `z` del objeto.
 
 ![882956f0-13c0-4392-bd30-d928d6316542](assets/882956f0-13c0-4392-bd30-d928d6316542.webp)
 
 **Ejemplo:**
+
+Basado del código dado en la documentación obtenemos el siguiente código.
 
 ```python
 from ursina import *
@@ -630,17 +632,17 @@ from ursina import *
 def update():
     # Si la tecla 'a' es presionada, mueve el cubo 5 unidades a la izquierda
     if held_keys['a']:
-        cube.y -= 5 * time.dt
+        cube.x -= 5 * time.dt
     # Si la tecla 'w' es presionada, mueve el cubo 5 unidades hacia adelante
     if held_keys['w']:
-        cube.z += 5 * time.dt
-    if held_keys['d']:
-        cube.x += 5 * time.dt
+        cube.y += 5 * time.dt
+    if held_keys['s']:
+        cube.y += 5 * time.dt
 
 app = Ursina()
 
 # Crea un cubo en la escena
-cube = Entity(model='cube', color=color.white, scale=(1,1,1))
+cube = Entity(model='cube',texture='brick', color=color.white, scale=(1,1,1))
 
 # Inicia la aplicación
 app.run()
@@ -648,33 +650,164 @@ app.run()
 
 Este script crea un entorno 3D con un cubo que puede ser movido utilizando las teclas del teclado. Aquí está la descripción de lo que hace cada tecla según el código:
 
-- **Tecla 'a'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia abajo en el eje `y`. Esto se debe a que el valor de `y` del cubo disminuye, lo que hace que el cubo se traslade verticalmente hacia abajo en la escena.
+- **Tecla 'a'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia abajo en el eje `-x`. Esto se debe a que el valor de `y` del cubo disminuye, lo que hace que el cubo se traslade verticalmente hacia abajo en la escena.
 
-- **Tecla 'w'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia adelante en el eje `z`. Aumentar el valor de `z` del cubo lo traslada hacia adelante en la escena, alejándose de la cámara si esta tiene una posición fija y mira hacia el origen desde una perspectiva estándar.
+- **Tecla 'w'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia adelante en el eje `+y`. Aumentar el valor de `z` del cubo lo traslada hacia adelante en la escena, alejándose de la cámara si esta tiene una posición fija y mira hacia el origen desde una perspectiva estándar.
 
-- **Tecla 'd'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia la derecha en el eje `x`. Esto se logra aumentando el valor de `x` del cubo, trasladándolo horizontalmente hacia la derecha en la pantalla.
+- **Tecla 'd'**: Al presionar esta tecla, el cubo se mueve 5 unidades hacia la derecha en el eje `+x`. Esto se logra aumentando el valor de `x` del cubo, trasladándolo horizontalmente hacia la derecha en la pantalla.
+
+Para este caso +x  es hacia la derecha y -x es para la izquierda des un mismo vector de dirección.
 
 La función `update()` se ejecuta continuamente mientras la aplicación está en funcionamiento, revisando en cada fotograma si alguna de las teclas especificadas ('a', 'w', 'd') está siendo presionada. Dependiendo de la tecla presionada, el cubo se mueve en la dirección correspondiente. El uso de `time.dt` en el cálculo asegura que el movimiento del cubo sea suave y consistente, independientemente de la tasa de fotogramas del juego, adaptando la velocidad del movimiento a la duración del fotograma actual.
 
-## 2. Rotación
+**Resultado:**
+
+![image-20240205102342073](assets/image-20240205102342073.png)
+
+Al desplazar el objeto  de un lugar a otro vemos el siguiente resultado:
+
+![image-20240205102523909](assets/image-20240205102523909.png)
+
+## 2. Clase 11: Rotation (Rotación)
 La rotación implica girar un objeto alrededor de uno o más de sus ejes. En Ursina, esto se logra ajustando los atributos `rotation_x`, `rotation_y`, y `rotation_z`.
 
-## 3. Escalado
+**Ejemplo:**
+
+Para aplicar una textura de ladrillos (bricks) a un cubo en Ursina y permitir la configuración de los grados de rotación mediante una constante, sigue este código actualizado. Además, he añadido una constante `ROTATION_SPEED` que puedes modificar para ajustar cuántos grados quieres que el cubo rote con cada pulsación de tecla.
+
+```python
+from ursina import *
+
+app = Ursina()
+
+# Constante para la velocidad de rotación (grados por pulsación de tecla)
+ROTATION_SPEED = 45
+
+cube = Entity(model='cube', texture='brick', scale=(1,1,1))
+
+def update():
+    # Rotación en el eje x con 'a'
+    if held_keys['a']:
+        cube.rotation_x += ROTATION_SPEED * time.dt
+    # Rotación en el eje y con 's'
+    if held_keys['s']:
+        cube.rotation_y += ROTATION_SPEED * time.dt
+    # Rotación en el eje z con 'w'
+    if held_keys['w']:
+        cube.rotation_z += ROTATION_SPEED * time.dt
+
+app.run()
+```
+
+### Descripción de las Teclas:
+
+- **Tecla 'a'**: Rota el cubo sobre el eje `x`. Esto inclina el cubo adelante y atrás. La rotación se basa en la constante `ROTATION_SPEED`, permitiendo ajustes fáciles a la velocidad de rotación.
+- **Tecla 's'**: Rota el cubo sobre el eje `y`. Esto gira el cubo hacia la izquierda y la derecha, también basado en `ROTATION_SPEED`.
+- **Tecla 'w'**: Rota el cubo sobre el eje `z`. Esto inclina el cubo de lado a lado, utilizando igualmente `ROTATION_SPEED` para determinar la velocidad de rotación.
+
+Con este enfoque, tienes un control flexible sobre la velocidad de rotación del cubo y puedes experimentar con diferentes grados de rotación para aumentar o reducir la velocidad de rotación.
+
+**Resultado:**
+
+![](assets/image-20240205100349873.png)
+
+Después de la rotación queda el siguiente rotación queda lo siguiente:
+
+![image-20240205103258306](assets/image-20240205103258306.png)
+
+## 3. Clase 12: Scale (Escalado)
 El escalado cambia el tamaño de un objeto. En Ursina, se puede escalar un objeto modificando sus propiedades `scale_x`, `scale_y`, y `scale_z`.
 
-## 4. Inclinación (Shearing)
-La inclinación o 'shearing' es una transformación que distorsiona la forma de un objeto alterando sus ángulos. Aunque menos común, puede ser útil para efectos especiales o ciertas visualizaciones.
+**Ejemplo:**
 
-## 5. Reflexión
-La reflexión es el espejado de un objeto respecto a un eje o plano. Se puede lograr mediante la modificación adecuada de las propiedades de escala y rotación.
+Para modificar el código de manera que, en lugar de rotar, cambie la escala del objeto (aumentando sus dimensiones en los ejes `x`, `y`, y `z`) cuando se presionan las teclas 'a', 's', y 'w', puedes hacer lo siguiente. También incluiré una constante `SCALE_SPEED` que determinará cuánto se ajusta la escala con cada pulsación de tecla. Aquí está el código actualizado:
 
-Cada una de estas transformaciones puede ser utilizada para manipular objetos en un entorno 3D en Ursina, permitiendo la creación de escenas dinámicas y atractivas. Además, estas transformaciones pueden combinarse para lograr efectos más complejos y detallados.
+```python
+from ursina import *
 
+app = Ursina()
 
+# Constante para la velocidad de cambio de escala
+SCALE_SPEED = 0.1
+
+cube = Entity(model='cube', texture='brick', scale=(1,1,1))
+
+def update():
+    # Aumenta la escala en el eje x con 'a'
+    if held_keys['a']:
+        cube.scale_x += SCALE_SPEED * time.dt
+    # Aumenta la escala en el eje y con 's'
+    if held_keys['s']:
+        cube.scale_y += SCALE_SPEED * time.dt
+    # Aumenta la escala en el eje z con 'w'
+    if held_keys['w']:
+        cube.scale_z += SCALE_SPEED * time.dt
+
+app.run()
+```
+
+Este código ajusta la escala del cubo en los ejes `x`, `y`, y `z` dependiendo de la tecla que se presione. La constante `SCALE_SPEED` se multiplica por `time.dt` para asegurar que el cambio de escala sea suave y proporcional al tiempo, lo que hace que el ajuste sea independiente de la tasa de fotogramas del juego.
+
+### Descripción de las Teclas:
+
+- **Tecla 'a'**: Aumenta la escala del cubo en el eje `x`, haciéndolo más ancho. La cantidad de ajuste está determinada por `SCALE_SPEED`.
+- **Tecla 's'**: Aumenta la escala del cubo en el eje `y`, haciéndolo más alto. Esto también se basa en el valor de `SCALE_SPEED`.
+- **Tecla 'w'**: Aumenta la escala del cubo en el eje `z`, haciéndolo más profundo. Al igual que con las otras dimensiones, el cambio depende de `SCALE_SPEED`.
+
+Con este código, ahora tienes un cubo en Ursina que cambia su tamaño en lugar de rotar cuando se presionan las teclas especificadas, lo que te permite explorar cómo la escala de los objetos puede ajustarse dinámicamente en tiempo real.
+
+**Resultado:**
+
+![image-20240205101827578](assets/image-20240205101827578.png)
+
+Al modificar la escala se deforma.
+
+![image-20240205101757241](assets/image-20240205101757241.png)
+
+## Clase 13: Setting Boundaries for the Movement (Estableciendo límites para el movimiento)
+
+En el contexto de un entorno de desarrollo de juegos o simulaciones 3D como Ursina, un cubo que se mueve de un lado a otro y rebota al alcanzar un límite se implementa mediante la actualización continua de su posición en el espacio tridimensional. Este movimiento se logra modificando las coordenadas del cubo (usualmente representadas por las variables `x`, `y`, y/o `z`) en cada cuadro o "tick" del juego, basándose en una velocidad o dirección predefinida. Cuando el cubo alcanza un límite específico del espacio de juego, que puede ser un valor de coordenada definido o el borde de la ventana de visualización, el algoritmo detecta esta condición y cambia la dirección del movimiento del cubo. Esto se realiza generalmente invirtiendo el signo de la velocidad en el eje correspondiente (por ejemplo, de positivo a negativo o viceversa), lo que hace que el cubo se mueva en la dirección opuesta. Este proceso de detección de límites y cambio de dirección se repite continuamente, creando un efecto de rebote donde el cubo va y viene dentro de los confines establecidos del espacio de juego.
+
+**Código**
+
+```python
+from ursina import *
+
+app = Ursina()
+
+# Velocidad constante de movimiento del cubo
+movement_speed = 0.1
+
+# Límites de movimiento en el eje x
+right_limit = 5
+left_limit = -5
+
+# Crea un cubo con textura de ladrillos
+cube = Entity(model='cube', texture='brick', scale=(1,1,1))
+
+def update():
+    # Mueve el cubo en el eje x
+    global movement_speed
+    cube.x += movement_speed
+    
+    # Revisa si el cubo ha alcanzado alguno de los límites y cambia la dirección del movimiento
+    if cube.x > right_limit or cube.x < left_limit:
+        movement_speed *= -1
+
+app.run()
+```
+
+**Resultado:**
+
+![image-20240205110556046](assets/image-20240205110556046.png)
+
+![image-20240205110606256](assets/image-20240205110606256.png)
+
+En imágenes no se puede apreciar, pero al llegar a cierto limite en `x` rebota y regresa siguiendo la dirección de `-x`.
 
 # Referencias
 
-Excelente guía rapida:
+Excelente guía rápida:
 
 -  Ursina for dummies , https://www.ursinaengine.org/ursina_for_dummies.html
 
